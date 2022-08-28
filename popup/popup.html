@@ -1,0 +1,53 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body {
+            width: 500px;
+        }
+
+        button {
+            background-color: #336dab;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Sorter for Youtube Music playlist</h1>
+    <fieldset>
+        <legend>Sort by field:</legend>
+        <div>
+            <input type="radio" id="BySong" name="sortField" value="Song" checked>
+            <label for="BySong">Song Name</label>
+        </div>
+        <div>
+            <input type="radio" id="ByArtist" name="sortField" value="Artist">
+            <label for="ByArtist">Artist</label>
+        </div>
+        <div>
+            <input type="radio" id="ByDateAdded" name="sortField" value="Date">
+            <label for="ByDateAdded">Date Added</label>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Order:</legend>
+        <div>
+            <input type="radio" id="Ascending" name="sortOrder" value="Ascending" checked>
+            <label for="Ascending">Ascending</label>
+        </div>
+        <div>
+            <input type="radio" id="Descending" name="sortOrder" value="Descending">
+            <label for="Descending">Descending</label>
+        </div>
+    </fieldset>
+    <button id="sortButton">Sort</button>
+    <script src="popup.js"></script>
+</body>
+
+</html>

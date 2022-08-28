@@ -1,0 +1,20 @@
+{
+    "name": "Youtube Music playlist sorter",
+    "version": "0.0.0.1",
+    "manifest_version": 3,
+    "description": "An extension to sort youtube music playlists",
+    "icons": {
+        "128": "icons/sorter128x128.png"
+    },
+    "action": {
+        "default_popup": "popup/popup.html"
+    },
+    "permissions": [
+        "debugger",
+        "tabs",
+        "storage",
+        "scripting",
+        "activeTab",
+        "cookies"
+    ]
+}
