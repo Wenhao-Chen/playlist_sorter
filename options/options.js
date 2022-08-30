@@ -25,15 +25,17 @@ function showTitleRule(originalTitle, newTitle, newArtist) {
     var b = document.createElement("button")
     b.textContent = "-"
     b.addEventListener("click", () => {
-        removeTitleRule(originalTitle, ()=>{
+        removeTitleRule(originalTitle, (newRules)=>{
             titleRuleTable.removeChild(newRow)
+            console.log(newRules)
+            updateTitleRulesCount(Object.getOwnPropertyNames(newRules).length)
         })
     })
     td4.appendChild(b)
     newRow.appendChild(td4)
 
-    if (titleRuleTable.childElementCount > 1) {
-        titleRuleTable.insertBefore(newRow, titleRuleTable.lastChild)
+    if (titleRuleTable.childElementCount > 2) {
+        titleRuleTable.insertBefore(newRow, titleRuleTable.childNodes[2])
     } else {
         titleRuleTable.appendChild(newRow)
     }
@@ -58,43 +60,71 @@ function showArtistRule(originalArtist, newArtist) {
     var b = document.createElement("button")
     b.textContent = "-"
     b.addEventListener("click", () => {
-        removeArtistRule(originalArtist, ()=>{
+        removeArtistRule(originalArtist, (newRules)=>{
             artistRuleTable.removeChild(newRow)
+            updateArtistRulesCount(Object.getOwnPropertyNames(newRules).length)
         })
     })
     td3.appendChild(b)
     newRow.appendChild(td3)
 
-    if (artistRuleTable.childElementCount > 1) {
-        artistRuleTable.insertBefore(newRow, artistRuleTable.lastChild)
+    if (artistRuleTable.childElementCount > 2) {
+        artistRuleTable.insertBefore(newRow, artistRuleTable.childNodes[2])
     } else {
         artistRuleTable.appendChild(newRow)
     }
 }
 
+function updateTitleRulesCount(count) {
+    document.getElementById("h3_titleRules").textContent = "Title Rules (count: "+count+")"
+}
+
+function updateArtistRulesCount(count) {
+    document.getElementById("h3_artistRules").textContent = "Artist Rules (count: "+count+")"
+}
+
+function resetTable(table) {
+    let allRows = table.childNodes;
+    let child0 = allRows[0]
+    let child1 = allRows[1]
+
+    table.innerHTML = ""
+    table.appendChild(child0)
+    table.appendChild(child1)
+}
+
+function showTitleRules(rules) {
+    let titles = Object.getOwnPropertyNames(rules)
+    resetTable(titleRuleTable)
+    titles.forEach(title=>{
+        const info = rules[title]
+        showTitleRule(title, info[0], info[1])
+    })
+    updateTitleRulesCount(titles.length)
+}
+
+function showArtistRules(rules) {
+    let artists = Object.getOwnPropertyNames(rules)
+    resetTable(artistRuleTable)
+    artists.forEach(artist=>{
+        showArtistRule(artist, rules[artist])
+    })
+    updateArtistRulesCount(artists.length)
+}
+
 loadTitleRules((rules)=>{
     if (rules) {
-        let titles = Object.getOwnPropertyNames(rules)
-        document.getElementById("h3_titleRules").textContent = "Title Rules (count: "+titles.length+")"
-        titles.forEach(title=>{
-            const info = rules[title]
-            showTitleRule(title, info[0], info[1])
-        })
+        showTitleRules(rules)
     }
 })
 
 loadArtistRules((rules)=>{
     if (rules) {
-        let artists = Object.getOwnPropertyNames(rules)
-        document.getElementById("h3_artistRules").textContent = "Artist Name Rules (count: "+artists.length+")"
-        artists.forEach(artist=>{
-            showArtistRule(artist, rules[artist])
-        })
+        showArtistRules(rules)
     }
 })
 
 document.getElementById("b_title").addEventListener("click", () => {
-
     let i1 = document.getElementById("originalTitle")
     let i2 = document.getElementById("newTitle")
     let i3 = document.getElementById("newArtist1")
@@ -110,14 +140,13 @@ document.getElementById("b_title").addEventListener("click", () => {
     i2.value = ""
     i3.value = ""
 
-    addTitleRule(originalTitle, newTitle, newArtist, ()=>{
+    addTitleRule(originalTitle, newTitle, newArtist, (newRules)=>{
         showTitleRule(originalTitle, newTitle, newArtist)
+        updateTitleRulesCount(newRules.length)
     })
 })
 
-
 document.getElementById("b_artist").addEventListener("click", () => {
-
     let i1 = document.getElementById("originalArtist")
     let i2 = document.getElementById("newArtist2")
     let originalArtist = i1.value
@@ -130,11 +159,14 @@ document.getElementById("b_artist").addEventListener("click", () => {
     i1.value = ""
     i2.value = ""
 
-    addArtistRule(originalArtist, newArtist, ()=>{
+    addArtistRule(originalArtist, newArtist, (newRules)=>{
         showArtistRule(originalArtist, newArtist)
+        updateArtistRulesCount(newRules.length)
     })
 })
 
+
+/* Sorting */
 // Down arrow:  &#9660; 25BC
 // Up arrow:    &#9650; 25B2
 let header_originalTitle = document.getElementById("header_originalTitle")
@@ -223,3 +255,76 @@ function sortArtistRules(header) {
 
 header_newArtist1.click()
 header_newArtist2.click()
+
+/* Import and Export */
+function download(content, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([content], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
+
+document.getElementById("export_titleRules").addEventListener("click",()=>{
+    loadTitleRules((rules)=>{
+        if (rules) {
+            download(JSON.stringify(rules), "title_rules.json", 'text/plain')
+        }
+    })
+})
+
+document.getElementById("import_titleRules").addEventListener("click",()=>{
+    document.getElementById("upload_titleFile").click()
+})
+
+document.getElementById("export_artistRules").addEventListener("click",()=>{
+    loadArtistRules((rules)=>{
+        if (rules) {
+            download(JSON.stringify(rules), "artist_rules.json", 'text/plain')
+        }
+    })
+})
+
+document.getElementById("import_artistRules").addEventListener("click",()=>{
+    document.getElementById("upload_artistFile").click()
+})
+
+function importJSON(e, callback) {
+    var uploadedFile = e.target.files[0];
+    if (!uploadedFile) {return}
+    if (uploadedFile.type != "application/json") {
+        alert("Not a valid JSON file")
+        return
+    }
+    console.log("file uploaded: "+uploadedFile.name)
+    var reader = new FileReader()
+    reader.onload = (ev)=>{
+        let obj = JSON.parse(ev.target.result)
+        console.log("json parsed:")
+        console.log(obj)
+        callback(obj)
+    }
+    reader.onerror = (ev)=>{
+        console.log("error occured while reading file "+uploadedFile.name)
+    }
+    reader.readAsText(uploadedFile)
+}
+document.getElementById("upload_titleFile").addEventListener("change",(e)=>{
+    importJSON(e, obj=>{
+        setTitleRules(obj, ()=>{
+            showTitleRules(obj)
+            header_newArtist1.click()
+            document.getElementById("upload_titleFile").value = ''
+        })
+    })
+})
+
+document.getElementById("upload_artistFile").addEventListener("change",(e)=>{
+    importJSON(e, obj=>{
+        setArtistRules(obj, ()=>{
+            showArtistRules(obj)
+            header_newArtist2.click()
+            document.getElementById("upload_artistFile").value = ''
+        })
+    })
+})

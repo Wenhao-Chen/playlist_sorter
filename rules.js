@@ -13,6 +13,18 @@ function loadArtistRules(callback) {
     loadRules("artistRules", callback)
 }
 
+function setTitleRules(rules, callback) {
+    chrome.storage.sync.set({"titleRules": rules}, ()=>{
+        callback()
+    })
+}
+
+function setArtistRules(rules, callback) {
+    chrome.storage.sync.set({"artistRules": rules}, ()=>{
+        callback()
+    })
+}
+
 function addTitleRule(title, newTitle, newArtist, callback) {
     loadTitleRules((rules)=>{
         var newRules = rules? rules: {}
