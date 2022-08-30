@@ -23,16 +23,12 @@
     <fieldset>
         <legend>Sort by field:</legend>
         <div>
-            <input type="radio" id="BySong" name="sortField" value="Song" checked>
+            <input type="radio" id="BySong" name="sortField" value="Song">
             <label for="BySong">Song Name</label>
         </div>
         <div>
-            <input type="radio" id="ByArtist" name="sortField" value="Artist">
+            <input type="radio" id="ByArtist" name="sortField" value="Artist" checked>
             <label for="ByArtist">Artist</label>
-        </div>
-        <div>
-            <input type="radio" id="ByDateAdded" name="sortField" value="Date">
-            <label for="ByDateAdded">Date Added</label>
         </div>
     </fieldset>
     <fieldset>
@@ -47,6 +43,7 @@
         </div>
     </fieldset>
     <button id="sortButton">Sort</button>
+    <script src="../rules.js"></script>
     <script src="popup.js"></script>
 </body>
 
